@@ -21,6 +21,8 @@ import PeopleIcon from '@mui/icons-material/People';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { useAuth } from '../context/AuthContext';
 import { useNavbarHeight } from '../context/NavbarHeightContext';
 
@@ -28,6 +30,14 @@ const menuItemsData = {
   ADMIN: [
     { name: 'Dashboard', path: '/', icon: <HomeIcon /> },
     { name: 'Proyectos', path: '/proyectos', icon: <BusinessIcon /> },
+    { 
+      name: 'Recursos', 
+      icon: <Inventory2Icon />,
+      children: [
+        { name: 'Materiales', path: '/materiales', icon: <Inventory2Icon /> },
+        { name: 'Proveedores', path: '/proveedores', icon: <LocalShippingIcon /> },
+      ]
+    },
     {
       name: 'Configuración',
       icon: <AdminPanelSettingsIcon />,
@@ -41,11 +51,20 @@ const menuItemsData = {
     { name: 'Dashboard', path: '/', icon: <HomeIcon /> },
     { name: 'Proyectos', path: '/proyectos', icon: <BusinessIcon /> },
     { name: 'Asignaciones', path: '/asignaciones', icon: <PeopleIcon /> },
+    { 
+      name: 'Recursos', 
+      icon: <Inventory2Icon />,
+      children: [
+        { name: 'Materiales', path: '/materiales', icon: <Inventory2Icon /> },
+        { name: 'Proveedores', path: '/proveedores', icon: <LocalShippingIcon /> },
+      ]
+    },
   ],
   GESTOR: [
     { name: 'Dashboard', path: '/', icon: <HomeIcon /> },
     { name: 'Proyectos', path: '/proyectos', icon: <BusinessIcon /> },
     { name: 'Tareas', path: '/tareas', icon: <AssignmentIcon /> },
+    { name: 'Materiales', path: '/materiales', icon: <Inventory2Icon /> },
   ],
   USER: [
     { name: 'Dashboard', path: '/', icon: <HomeIcon /> },

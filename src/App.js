@@ -6,7 +6,11 @@ import Sidebar from './components/Sidebar';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProyectosPage from './pages/ProyectosPage';
-import ProyectoDetallePage from './pages/ProyectoDetallePage'; // Nuevo import
+import ProyectoDetallePage from './pages/ProyectoDetallePage';
+import MaterialesPage from './pages/MaterialesPage';
+import MaterialDetallePage from './pages/MaterialDetallePage';
+import ProveedoresPage from './pages/ProveedoresPage';
+import ProveedorDetallePage from './pages/ProveedorDetallePage';
 import { useAuth } from './context/AuthContext';
 
 // Protected Route component
@@ -78,10 +82,35 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* Nueva ruta para detalles de proyectos */}
           <Route path="/proyectos/:id" element={
             <ProtectedRoute>
               <ProyectoDetallePage />
+            </ProtectedRoute>
+          } />
+          
+          {/* Nuevas rutas para materiales */}
+          <Route path="/materiales" element={
+            <ProtectedRoute>
+              <MaterialesPage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/materiales/:id" element={
+            <ProtectedRoute>
+              <MaterialDetallePage />
+            </ProtectedRoute>
+          } />
+          
+          {/* Nuevas rutas para proveedores */}
+          <Route path="/proveedores" element={
+            <ProtectedRoute>
+              <ProveedoresPage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/proveedores/:id" element={
+            <ProtectedRoute>
+              <ProveedorDetallePage />
             </ProtectedRoute>
           } />
           

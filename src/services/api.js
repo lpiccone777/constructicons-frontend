@@ -231,12 +231,122 @@ const asignacionesApi = {
   }
 };
 
+// API de materiales
+const materialesApi = {
+  // Obtener todos los materiales
+  getMateriales: async (categoria) => {
+    const params = {};
+    if (categoria) params.categoria = categoria;
+    
+    const response = await apiClient.get('/materiales', { params });
+    return response.data;
+  },
+  
+  // Obtener un material específico
+  getMaterial: async (id) => {
+    const response = await apiClient.get(`/materiales/${id}`);
+    return response.data;
+  },
+  
+  // Crear un nuevo material
+  createMaterial: async (materialData) => {
+    const response = await apiClient.post('/materiales', materialData);
+    return response.data;
+  },
+  
+  // Actualizar un material existente
+  updateMaterial: async (id, materialData) => {
+    const response = await apiClient.put(`/materiales/${id}`, materialData);
+    return response.data;
+  },
+  
+  // Eliminar un material
+  deleteMaterial: async (id) => {
+    const response = await apiClient.delete(`/materiales/${id}`);
+    return response.data;
+  },
+  
+  // Obtener categorías de materiales
+  getCategoriasMateriales: async () => {
+    const response = await apiClient.get('/materiales/categorias');
+    return response.data;
+  }
+};
+
+// API de proveedores
+const proveedoresApi = {
+  // Obtener todos los proveedores
+  getProveedores: async (categoria) => {
+    const params = {};
+    if (categoria) params.categoria = categoria;
+    
+    const response = await apiClient.get('/proveedores', { params });
+    return response.data;
+  },
+  
+  // Obtener un proveedor específico
+  getProveedor: async (id) => {
+    const response = await apiClient.get(`/proveedores/${id}`);
+    return response.data;
+  },
+  
+  // Crear un nuevo proveedor
+  createProveedor: async (proveedorData) => {
+    const response = await apiClient.post('/proveedores', proveedorData);
+    return response.data;
+  },
+  
+  // Actualizar un proveedor existente
+  updateProveedor: async (id, proveedorData) => {
+    const response = await apiClient.put(`/proveedores/${id}`, proveedorData);
+    return response.data;
+  },
+  
+  // Eliminar un proveedor
+  deleteProveedor: async (id) => {
+    const response = await apiClient.delete(`/proveedores/${id}`);
+    return response.data;
+  },
+  
+  // Obtener contactos de un proveedor
+  getContactos: async (proveedorId) => {
+    const response = await apiClient.get(`/proveedores/${proveedorId}/contactos`);
+    return response.data;
+  },
+  
+  // Obtener un contacto específico
+  getContacto: async (id) => {
+    const response = await apiClient.get(`/proveedores/contactos/${id}`);
+    return response.data;
+  },
+  
+  // Crear un nuevo contacto
+  createContacto: async (contactoData) => {
+    const response = await apiClient.post('/proveedores/contactos', contactoData);
+    return response.data;
+  },
+  
+  // Actualizar un contacto existente
+  updateContacto: async (id, contactoData) => {
+    const response = await apiClient.put(`/proveedores/contactos/${id}`, contactoData);
+    return response.data;
+  },
+  
+  // Eliminar un contacto
+  deleteContacto: async (id) => {
+    const response = await apiClient.delete(`/proveedores/contactos/${id}`);
+    return response.data;
+  }
+};
+
 export default {
   proyectos: proyectosApi,
   etapas: etapasApi,
   tareas: tareasApi,
   users: usersApi,
   asignaciones: asignacionesApi,
+  materiales: materialesApi,
+  proveedores: proveedoresApi,
   
   // Autenticación
   login: async (email, password) => {
