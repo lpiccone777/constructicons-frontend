@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import MaterialesProyectoTab from '../components/MaterialesProyectoTab';
 import {
   Box,
   Typography,
@@ -700,6 +702,7 @@ const ProyectoDetallePage = () => {
             <Tab label="Asignaciones" />
             <Tab label="Documentos" />
             <Tab label="Notas" />
+            <Tab label="Materiales" /> 
           </Tabs>
         </Paper>
       </Box>
@@ -849,6 +852,16 @@ const ProyectoDetallePage = () => {
                               >
                                 <DeleteOutline fontSize="small" />
                               </IconButton>
+                              {/* Nuevo botón para acceder a materiales */}
+                              <Tooltip title="Gestionar Materiales">
+                                <IconButton 
+                                  size="small" 
+                                  color="primary"
+                                  onClick={() => navigate(`/tareas/${tarea.id}/materiales`)}
+                                >
+                                  <Inventory2Icon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
                             </CardActions>
                           </Card>
                         </Grid>
@@ -897,6 +910,15 @@ const ProyectoDetallePage = () => {
         <Alert severity="info">
           Esta funcionalidad estará disponible próximamente. Aquí podrás gestionar las notas y comentarios del proyecto.
         </Alert>
+      </TabPanel>
+
+      <TabPanel value={tabValue} index={4}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+          <Inventory2Icon sx={{ mr: 1 }} color="primary" />
+          <Typography variant="h5">Materiales del Proyecto</Typography>
+        </Box>
+        
+        <MaterialesProyectoTab proyectoId={id} />
       </TabPanel>
       
       {/* Diálogo para crear/editar etapa */}

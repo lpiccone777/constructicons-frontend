@@ -580,6 +580,14 @@ const ProveedorDetallePage = () => {
           <Typography variant="h6">
             Materiales Asociados
           </Typography>
+          <Box sx={{ flexGrow: 1 }} />
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => navigate(`/proveedores/${id}/materiales`)}
+          >
+            Ver todos los materiales
+          </Button>
         </Box>
         
         <Alert severity="info" sx={{ mb: 2 }}>

@@ -113,6 +113,24 @@ function App() {
               <ProveedorDetallePage />
             </ProtectedRoute>
           } />
+
+          <Route path="/tareas/:id/materiales" element={
+            <ProtectedRoute>
+              <MaterialesTareaPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/materiales/:id/proveedores" element={
+            <ProtectedRoute>
+              <ProveedoresMaterialPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/proveedores/:id/materiales" element={
+            <ProtectedRoute>
+              <MaterialesProveedorPage />
+            </ProtectedRoute>
+          } />
           
           {/* Redirigir a la página principal si la ruta no existe */}
           <Route path="*" element={<Navigate to="/" replace />} />

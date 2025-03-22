@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import BusinessIcon from '@mui/icons-material/Business';
 import {
   Box,
   Typography,
@@ -120,6 +121,15 @@ const MaterialDetallePage = () => {
             onClick={handleEdit}
           >
             Editar
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            sx={{ mr: 1 }}
+            startIcon={<BusinessIcon />}
+            onClick={() => navigate(`/materiales/${id}/proveedores`)}
+          >
+            Proveedores
           </Button>
           <Button
             variant="outlined"

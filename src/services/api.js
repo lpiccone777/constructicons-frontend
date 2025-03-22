@@ -339,6 +339,92 @@ const proveedoresApi = {
   }
 };
 
+// API de asignaciones de materiales
+const asignacionesMaterialesApi = {
+  // Obtener todas las asignaciones de materiales
+  getAsignacionesMateriales: async (tareaId, materialId, estado) => {
+    const params = {};
+    if (tareaId) params.tareaId = tareaId;
+    if (materialId) params.materialId = materialId;
+    if (estado) params.estado = estado;
+    
+    const response = await apiClient.get('/asignaciones-materiales', { params });
+    return response.data;
+  },
+  
+  // Obtener una asignación de material específica
+  getAsignacionMaterial: async (id) => {
+    const response = await apiClient.get(`/asignaciones-materiales/${id}`);
+    return response.data;
+  },
+  
+  // Crear una nueva asignación de material
+  createAsignacionMaterial: async (asignacionData) => {
+    const response = await apiClient.post('/asignaciones-materiales', asignacionData);
+    return response.data;
+  },
+  
+  // Actualizar una asignación de material existente
+  updateAsignacionMaterial: async (id, asignacionData) => {
+    const response = await apiClient.put(`/asignaciones-materiales/${id}`, asignacionData);
+    return response.data;
+  },
+  
+  // Eliminar una asignación de material
+  deleteAsignacionMaterial: async (id) => {
+    const response = await apiClient.delete(`/asignaciones-materiales/${id}`);
+    return response.data;
+  },
+  
+  // Obtener resumen de materiales por proyecto
+  getResumenMaterialesPorProyecto: async (proyectoId) => {
+    const response = await apiClient.get(`/asignaciones-materiales/proyecto/${proyectoId}/resumen`);
+    return response.data;
+  }
+};
+
+const materialesProveedores: {
+  // Obtener todas las relaciones material-proveedor
+  getMaterialesProveedores: async (materialId, proveedorId) => {
+    const params = {};
+    if (materialId) params.materialId = materialId;
+    if (proveedorId) params.proveedorId = proveedorId;
+    
+    const response = await apiClient.get('/materiales-proveedores', { params });
+    return response.data;
+  },
+  
+  // Obtener una relación material-proveedor específica
+  getMaterialProveedor: async (id) => {
+    const response = await apiClient.get(`/materiales-proveedores/${id}`);
+    return response.data;
+  },
+  
+  // Crear una nueva relación material-proveedor
+  createMaterialProveedor: async (data) => {
+    const response = await apiClient.post('/materiales-proveedores', data);
+    return response.data;
+  },
+  
+  // Actualizar una relación material-proveedor existente
+  updateMaterialProveedor: async (id, data) => {
+    const response = await apiClient.put(`/materiales-proveedores/${id}`, data);
+    return response.data;
+  },
+  
+  // Eliminar una relación material-proveedor
+  deleteMaterialProveedor: async (id) => {
+    const response = await apiClient.delete(`/materiales-proveedores/${id}`);
+    return response.data;
+  },
+  
+  // Obtener comparativa de proveedores para un material
+  getComparativaProveedores: async (materialId) => {
+    const response = await apiClient.get(`/materiales-proveedores/material/${materialId}/comparativa`);
+    return response.data;
+  }
+};
+
 export default {
   proyectos: proyectosApi,
   etapas: etapasApi,
@@ -347,6 +433,7 @@ export default {
   asignaciones: asignacionesApi,
   materiales: materialesApi,
   proveedores: proveedoresApi,
+  asignacionesMateriales: asignacionesMaterialesApi,
   
   // Autenticación
   login: async (email, password) => {
