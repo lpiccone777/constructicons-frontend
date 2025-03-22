@@ -12,6 +12,9 @@ import MaterialDetallePage from './pages/MaterialDetallePage';
 import ProveedoresPage from './pages/ProveedoresPage';
 import ProveedorDetallePage from './pages/ProveedorDetallePage';
 import { useAuth } from './context/AuthContext';
+import MaterialesTareaPage from './pages/MaterialesTareaPage';
+import ProveedoresMaterialPage from './pages/ProveedoresMaterialPage';
+import MaterialesProveedorPage from './pages/MaterialesProveedorPage';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {

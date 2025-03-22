@@ -383,7 +383,8 @@ const asignacionesMaterialesApi = {
   }
 };
 
-const materialesProveedores: {
+// API de materiales-proveedores
+const materialesProveedoresApi = {
   // Obtener todas las relaciones material-proveedor
   getMaterialesProveedores: async (materialId, proveedorId) => {
     const params = {};
@@ -434,6 +435,7 @@ export default {
   materiales: materialesApi,
   proveedores: proveedoresApi,
   asignacionesMateriales: asignacionesMaterialesApi,
+  materialesProveedores: materialesProveedoresApi,
   
   // Autenticación
   login: async (email, password) => {
