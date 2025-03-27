@@ -11,10 +11,13 @@ import MaterialesPage from './pages/MaterialesPage';
 import MaterialDetallePage from './pages/MaterialDetallePage';
 import ProveedoresPage from './pages/ProveedoresPage';
 import ProveedorDetallePage from './pages/ProveedorDetallePage';
-import { useAuth } from './context/AuthContext';
 import MaterialesTareaPage from './pages/MaterialesTareaPage';
 import ProveedoresMaterialPage from './pages/ProveedoresMaterialPage';
 import MaterialesProveedorPage from './pages/MaterialesProveedorPage';
+import GremiosPage from './pages/GremiosPage';
+import EspecialidadesPage from './pages/EspecialidadesPage';
+import EmpleadosPage from './pages/EmpleadosPage';
+import { useAuth } from './context/AuthContext';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -22,7 +25,14 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh'
+        }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -47,13 +57,13 @@ function App() {
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
       <CssBaseline />
-      
+
       {/* Navbar */}
       <Navbar />
-      
+
       {/* Sidebar */}
       {user && <Sidebar onWidthChange={handleSidebarWidthChange} />}
-      
+
       {/* Main Content */}
       <Box
         component="main"
@@ -71,71 +81,116 @@ function App() {
         <Routes>
           {/* Rutas públicas */}
           <Route path="/login" element={<LoginPage />} />
-          
+
           {/* Rutas protegidas */}
-          <Route path="/" element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/proyectos" element={
-            <ProtectedRoute>
-              <ProyectosPage />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/proyectos/:id" element={
-            <ProtectedRoute>
-              <ProyectoDetallePage />
-            </ProtectedRoute>
-          } />
-          
-          {/* Nuevas rutas para materiales */}
-          <Route path="/materiales" element={
-            <ProtectedRoute>
-              <MaterialesPage />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/materiales/:id" element={
-            <ProtectedRoute>
-              <MaterialDetallePage />
-            </ProtectedRoute>
-          } />
-          
-          {/* Nuevas rutas para proveedores */}
-          <Route path="/proveedores" element={
-            <ProtectedRoute>
-              <ProveedoresPage />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/proveedores/:id" element={
-            <ProtectedRoute>
-              <ProveedorDetallePage />
-            </ProtectedRoute>
-          } />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/proyectos"
+            element={
+              <ProtectedRoute>
+                <ProyectosPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/proyectos/:id"
+            element={
+              <ProtectedRoute>
+                <ProyectoDetallePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/materiales"
+            element={
+              <ProtectedRoute>
+                <MaterialesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/materiales/:id"
+            element={
+              <ProtectedRoute>
+                <MaterialDetallePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/proveedores"
+            element={
+              <ProtectedRoute>
+                <ProveedoresPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/proveedores/:id"
+            element={
+              <ProtectedRoute>
+                <ProveedorDetallePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tareas/:id/materiales"
+            element={
+              <ProtectedRoute>
+                <MaterialesTareaPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/materiales/:id/proveedores"
+            element={
+              <ProtectedRoute>
+                <ProveedoresMaterialPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/proveedores/:id/materiales"
+            element={
+              <ProtectedRoute>
+                <MaterialesProveedorPage />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/tareas/:id/materiales" element={
-            <ProtectedRoute>
-              <MaterialesTareaPage />
-            </ProtectedRoute>
-          } />
+          {/* Rutas nuevas para los módulos de RRHH integrados en Recursos */}
+          <Route
+            path="/gremios"
+            element={
+              <ProtectedRoute>
+                <GremiosPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/especialidades"
+            element={
+              <ProtectedRoute>
+                <EspecialidadesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/empleados"
+            element={
+              <ProtectedRoute>
+                <EmpleadosPage />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/materiales/:id/proveedores" element={
-            <ProtectedRoute>
-              <ProveedoresMaterialPage />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/proveedores/:id/materiales" element={
-            <ProtectedRoute>
-              <MaterialesProveedorPage />
-            </ProtectedRoute>
-          } />
-          
-          {/* Redirigir a la página principal si la ruta no existe */}
+          {/* Redirigir si la ruta no existe */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Box>

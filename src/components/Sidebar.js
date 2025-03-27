@@ -30,13 +30,16 @@ const menuItemsData = {
   ADMIN: [
     { name: 'Dashboard', path: '/', icon: <HomeIcon /> },
     { name: 'Proyectos', path: '/proyectos', icon: <BusinessIcon /> },
-    { 
-      name: 'Recursos', 
+    {
+      name: 'Recursos',
       icon: <Inventory2Icon />,
       children: [
         { name: 'Materiales', path: '/materiales', icon: <Inventory2Icon /> },
         { name: 'Proveedores', path: '/proveedores', icon: <LocalShippingIcon /> },
-      ]
+        { name: 'Gremios', path: '/gremios', icon: <BusinessIcon /> },
+        { name: 'Especialidades', path: '/especialidades', icon: <BusinessIcon /> },
+        { name: 'Empleados', path: '/empleados', icon: <PeopleIcon /> },
+      ],
     },
     {
       name: 'Configuración',
@@ -46,7 +49,8 @@ const menuItemsData = {
         { name: 'Roles', path: '/roles', icon: <AdminPanelSettingsIcon /> },
       ],
     },
-  ],
+  ]
+  ,
   DIRECTOR: [
     { name: 'Dashboard', path: '/', icon: <HomeIcon /> },
     { name: 'Proyectos', path: '/proyectos', icon: <BusinessIcon /> },
