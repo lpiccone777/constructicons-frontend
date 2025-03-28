@@ -16,7 +16,7 @@ import {
   TextField,
   Alert
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const EspecialidadForm = ({ especialidad, onClose, onSave }) => {
@@ -114,13 +114,15 @@ const EspecialidadForm = ({ especialidad, onClose, onSave }) => {
   );
 };
 
-const EspecialidadesPage = () => {
+const EspecialidadesPage = ({ asignarA }) => {
+  const { id: entidadId } = useParams();
+  const navigate = useNavigate();
+
   const [especialidades, setEspecialidades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [openForm, setOpenForm] = useState(false);
   const [currentEspecialidad, setCurrentEspecialidad] = useState(null);
-  const navigate = useNavigate();
 
   const fetchEspecialidades = async () => {
     setLoading(true);
@@ -129,8 +131,7 @@ const EspecialidadesPage = () => {
       setEspecialidades(data);
       setError('');
     } catch (err) {
-      console.error('Error al cargar especialidades:', err);
-      setError('No se pudieron cargar las especialidades. Intente nuevamente.');
+      setError('No se pudieron cargar las especialidades.');
     } finally {
       setLoading(false);
     }
@@ -139,6 +140,18 @@ const EspecialidadesPage = () => {
   useEffect(() => {
     fetchEspecialidades();
   }, []);
+
+  const handleAsignarEspecialidad = async (especialidadId) => {
+    try {
+      await api[`asignacionEspecialidad${asignarA === 'etapa' ? 'Etapa' : 'Tarea'}`].createAsignacion({
+        especialidadId,
+        [`${asignarA}Id`]: Number(entidadId),
+      });
+      navigate(-1);
+    } catch (err) {
+      setError('Error al realizar la asignación.');
+    }
+  };
 
   const handleOpenForm = (especialidad = null) => {
     setCurrentEspecialidad(especialidad);
@@ -167,11 +180,15 @@ const EspecialidadesPage = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Gestión de Especialidades
+        {asignarA ? 'Asignar Especialidad' : 'Gestión de Especialidades'}
       </Typography>
-      <Button variant="contained" onClick={() => handleOpenForm()} sx={{ mb: 2 }}>
-        Nueva Especialidad
-      </Button>
+
+      {!asignarA && (
+        <Button variant="contained" onClick={() => handleOpenForm()} sx={{ mb: 2 }}>
+          Nueva Especialidad
+        </Button>
+      )}
+
       {loading ? (
         <Typography>Cargando...</Typography>
       ) : error ? (
@@ -196,12 +213,32 @@ const EspecialidadesPage = () => {
                   <TableCell>{esp.nombre}</TableCell>
                   <TableCell>${Number(esp.valorHoraBase).toLocaleString('es-AR')}</TableCell>
                   <TableCell>
-                    <Button variant="outlined" onClick={() => handleOpenForm(esp)} sx={{ mr: 1 }}>
-                      Editar
-                    </Button>
-                    <Button variant="outlined" color="error" onClick={() => handleDeleteEspecialidad(esp.id)}>
-                      Eliminar
-                    </Button>
+                    {asignarA ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleAsignarEspecialidad(esp.id)}
+                      >
+                        Asignar
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          variant="outlined"
+                          onClick={() => handleOpenForm(esp)}
+                          sx={{ mr: 1 }}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleDeleteEspecialidad(esp.id)}
+                        >
+                          Eliminar
+                        </Button>
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -209,8 +246,13 @@ const EspecialidadesPage = () => {
           </Table>
         </Paper>
       )}
+
       <Dialog open={openForm} onClose={handleCloseForm} fullWidth maxWidth="sm">
-        <EspecialidadForm especialidad={currentEspecialidad} onClose={handleCloseForm} onSave={handleSaveEspecialidad} />
+        <EspecialidadForm
+          especialidad={currentEspecialidad}
+          onClose={handleCloseForm}
+          onSave={handleSaveEspecialidad}
+        />
       </Dialog>
     </Box>
   );

@@ -189,6 +189,44 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* Rutas para Asignaciones de Especialidades y Empleados a Etapas y Tareas */}
+          <Route
+            path="/etapas/:id/asignar-empleados"
+            element={
+              <ProtectedRoute>
+                {/* Crea la vista correspondiente */}
+                <EmpleadosPage asignarA="etapa" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/etapas/:id/asignar-especialidades"
+            element={
+              <ProtectedRoute>
+                {/* Crea la vista correspondiente */}
+                <EspecialidadesPage asignarA="etapa" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tareas/:id/asignar-empleados"
+            element={
+              <ProtectedRoute>
+                {/* Crea la vista correspondiente */}
+                <EmpleadosPage asignarA="tarea" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tareas/:id/asignar-especialidades"
+            element={
+              <ProtectedRoute>
+                {/* Crea la vista correspondiente */}
+                <EspecialidadesPage asignarA="tarea" />
+              </ProtectedRoute>
+            }
+          />
+
 
           {/* Redirigir si la ruta no existe */}
           <Route path="*" element={<Navigate to="/" replace />} />

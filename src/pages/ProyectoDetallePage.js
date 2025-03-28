@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import MaterialesProyectoTab from '../components/MaterialesProyectoTab';
+import AsignacionesEtapasTareas from '../components/Asignaciones/AsignacionesEtapasTareas';
+
 import {
   Box,
   Typography,
@@ -699,7 +701,6 @@ const ProyectoDetallePage = () => {
             scrollButtons="auto"
           >
             <Tab label="Etapas y Tareas" />
-            <Tab label="Asignaciones" />
             <Tab label="Documentos" />
             <Tab label="Notas" />
             <Tab label="Materiales" /> 
@@ -707,190 +708,252 @@ const ProyectoDetallePage = () => {
         </Paper>
       </Box>
       
-      {/* Contenido de las pestañas */}
-      <TabPanel value={tabValue} index={0}>
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h5">Etapas del Proyecto</Typography>
-          <Button 
-            variant="contained" 
-            startIcon={<Add />}
-            onClick={() => handleOpenEtapaForm()}
-          >
-            Nueva Etapa
-          </Button>
-        </Box>
-        
-        {proyecto.etapas && proyecto.etapas.length > 0 ? (
-          proyecto.etapas
-            .sort((a, b) => a.orden - b.orden)
-            .map((etapa) => (
-              <Paper key={etapa.id} sx={{ mb: 3, p: 0, overflow: 'hidden' }}>
-                <Box sx={{ 
-                  p: 2, 
-                  bgcolor: 'primary.main', 
-                  color: 'primary.contrastText',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}>
-                  <Box>
-                    <Typography variant="h6">
-                      {etapa.orden}. {etapa.nombre}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                      {getEstadoChip(etapa.estado)}
-                      <Typography variant="body2" sx={{ ml: 2 }}>
-                        Avance: {etapa.avance}%
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Box>
-                    <Tooltip title="Editar Etapa">
-                      <IconButton
-                        color="inherit"
-                        onClick={() => handleOpenEtapaForm(etapa)}
-                      >
-                        <Edit />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Eliminar Etapa">
-                      <IconButton
-                        color="inherit"
-                        onClick={() => handleDeleteConfirm('etapa', etapa.id)}
-                      >
-                        <DeleteOutline />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </Box>
-                
-                <Box sx={{ p: 2 }}>
-                  <Typography variant="body2" sx={{ mb: 2 }}>
-                    {etapa.descripcion || 'Sin descripción'}
-                  </Typography>
-                  
-                  <Grid container spacing={2} sx={{ mb: 2 }}>
-                    <Grid item xs={12} sm={4}>
-                      <Typography variant="body2" color="text.secondary">
-                        Presupuesto
-                      </Typography>
-                      <Typography variant="body1">
-                        ${Number(etapa.presupuesto).toLocaleString('es-AR')}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Typography variant="body2" color="text.secondary">
-                        Fecha Inicio
-                      </Typography>
-                      <Typography variant="body1">
-                        {formatDate(etapa.fechaInicio)}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Typography variant="body2" color="text.secondary">
-                        Fecha Fin Estimada
-                      </Typography>
-                      <Typography variant="body1">
-                        {formatDate(etapa.fechaFinEstimada)}
-                      </Typography>
-                    </Grid>
+{/* Contenido de las pestañas */}
+<TabPanel value={tabValue} index={0}>
+  <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Typography variant="h5">Etapas del Proyecto</Typography>
+    <Button 
+      variant="contained" 
+      startIcon={<Add />}
+      onClick={() => handleOpenEtapaForm()}
+    >
+      Nueva Etapa
+    </Button>
+  </Box>
+  
+  {proyecto.etapas && proyecto.etapas.length > 0 ? (
+    proyecto.etapas
+      .sort((a, b) => a.orden - b.orden)
+      .map((etapa) => (
+        <Paper key={etapa.id} sx={{ mb: 3, overflow: 'hidden' }}>
+          <Box sx={{ 
+            p: 2, 
+            bgcolor: 'primary.main', 
+            color: 'primary.contrastText',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <Box>
+              <Typography variant="h6">
+                {etapa.orden}. {etapa.nombre}
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                {getEstadoChip(etapa.estado)}
+                <Typography variant="body2" sx={{ ml: 2 }}>
+                  Avance: {etapa.avance}%
+                </Typography>
+              </Box>
+            </Box>
+            <Box>
+              <Tooltip title="Editar Etapa">
+                <IconButton
+                  color="inherit"
+                  onClick={() => handleOpenEtapaForm(etapa)}
+                >
+                  <Edit />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Eliminar Etapa">
+                <IconButton
+                  color="inherit"
+                  onClick={() => handleDeleteConfirm('etapa', etapa.id)}
+                >
+                  <DeleteOutline />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+
+          <Box sx={{ p: 2 }}>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {etapa.descripcion || 'Sin descripción'}
+            </Typography>
+            
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <Grid item xs={12} sm={4}>
+                <Typography variant="body2" color="text.secondary">
+                  Presupuesto
+                </Typography>
+                <Typography variant="body1">
+                  ${Number(etapa.presupuesto).toLocaleString('es-AR')}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Typography variant="body2" color="text.secondary">
+                  Fecha Inicio
+                </Typography>
+                <Typography variant="body1">
+                  {formatDate(etapa.fechaInicio)}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Typography variant="body2" color="text.secondary">
+                  Fecha Fin Estimada
+                </Typography>
+                <Typography variant="body1">
+                  {formatDate(etapa.fechaFinEstimada)}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            {/* Botones para asignar Especialidades y Empleados a la Etapa */}
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <Button 
+                variant="outlined" 
+                size="small"
+                startIcon={<Group />}
+                onClick={() => navigate(`/etapas/${etapa.id}/asignar-empleados`)}
+              >
+                + Agregar Empleado
+              </Button>
+              <Button 
+                variant="outlined" 
+                size="small"
+                startIcon={<EventNote />}
+                onClick={() => navigate(`/etapas/${etapa.id}/asignar-especialidades`)}
+              >
+                + Agregar Especialidad
+              </Button>
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
+            
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="subtitle1">
+                Tareas ({etapa.tareas ? etapa.tareas.length : 0})
+              </Typography>
+              <Button 
+                variant="outlined" 
+                size="small"
+                startIcon={<Add />}
+                onClick={() => handleOpenTareaForm(etapa.id)}
+              >
+                Agregar Tarea
+              </Button>
+            </Box>
+            
+            {etapa.tareas && etapa.tareas.length > 0 ? (
+              <Grid container spacing={2}>
+                {etapa.tareas
+                  .sort((a, b) => a.orden - b.orden)
+                  .map((tarea) => (
+                  <Grid item xs={12} sm={6} md={4} key={tarea.id}>
+                    <Card sx={{ height: '100%' }}>
+                      <CardHeader
+                        title={`${tarea.orden}. ${tarea.nombre}`}
+                        subheader={
+                          <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
+                            {getEstadoChip(tarea.estado)}
+                            {getPrioridadChip(tarea.prioridad)}
+                          </Box>
+                        }
+                      />
+                      <CardContent sx={{ pt: 0 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          {tarea.descripcion || 'Sin descripción'}
+                        </Typography>
+                      </CardContent>
+                      <CardActions>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleOpenTareaForm(etapa.id, tarea)}
+                        >
+                          <Edit fontSize="small" />
+                        </IconButton>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => handleDeleteConfirm('tarea', tarea.id)}
+                        >
+                          <DeleteOutline fontSize="small" />
+                        </IconButton>
+                        <Tooltip title="Gestionar Materiales">
+                          <IconButton 
+                            size="small" 
+                            color="primary"
+                            onClick={() => navigate(`/tareas/${tarea.id}/materiales`)}
+                          >
+                            <Inventory2Icon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        {/* Nuevos botones para asignaciones en tareas */}
+                        <Tooltip title="Asignar Empleados">
+                          <IconButton 
+                            size="small" 
+                            color="secondary"
+                            onClick={() => navigate(`/tareas/${tarea.id}/asignar-empleados`)}
+                          >
+                            <Group fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Asignar Especialidades">
+                          <IconButton 
+                            size="small" 
+                            color="secondary"
+                            onClick={() => navigate(`/tareas/${tarea.id}/asignar-especialidades`)}
+                          >
+                            <EventNote fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </CardActions>
+                    </Card>
                   </Grid>
-                  
-                  <Divider sx={{ my: 2 }} />
-                  
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="subtitle1">
-                      Tareas ({etapa.tareas ? etapa.tareas.length : 0})
-                    </Typography>
-                    <Button 
-                      variant="outlined" 
-                      size="small"
-                      startIcon={<Add />}
-                      onClick={() => handleOpenTareaForm(etapa.id)}
-                    >
-                      Agregar Tarea
-                    </Button>
-                  </Box>
-                  
-                  {etapa.tareas && etapa.tareas.length > 0 ? (
-                    <Grid container spacing={2}>
-                      {etapa.tareas
-                        .sort((a, b) => a.orden - b.orden)
-                        .map((tarea) => (
-                        <Grid item xs={12} sm={6} md={4} key={tarea.id}>
-                          <Card sx={{ height: '100%' }}>
-                            <CardHeader
-                              title={`${tarea.orden}. ${tarea.nombre}`}
-                              subheader={
-                                <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
-                                  {getEstadoChip(tarea.estado)}
-                                  {getPrioridadChip(tarea.prioridad)}
-                                </Box>
-                              }
-                            />
-                            <CardContent sx={{ pt: 0 }}>
-                              <Typography variant="body2" color="text.secondary">
-                                {tarea.descripcion || 'Sin descripción'}
-                              </Typography>
-                              <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-                                <AccessTime fontSize="small" color="action" />
-                                <Typography variant="body2" sx={{ ml: 1 }}>
-                                  {formatDate(tarea.fechaInicio)} - {formatDate(tarea.fechaFinEstimada)}
-                                </Typography>
-                              </Box>
-                            </CardContent>
-                            <CardActions>
-                              <IconButton 
-                                size="small" 
-                                onClick={() => handleOpenTareaForm(etapa.id, tarea)}
-                              >
-                                <Edit fontSize="small" />
-                              </IconButton>
-                              <IconButton 
-                                size="small" 
-                                onClick={() => handleDeleteConfirm('tarea', tarea.id)}
-                              >
-                                <DeleteOutline fontSize="small" />
-                              </IconButton>
-                              {/* Nuevo botón para acceder a materiales */}
-                              <Tooltip title="Gestionar Materiales">
-                                <IconButton 
-                                  size="small" 
-                                  color="primary"
-                                  onClick={() => navigate(`/tareas/${tarea.id}/materiales`)}
-                                >
-                                  <Inventory2Icon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </CardActions>
-                          </Card>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  ) : (
-                    <Typography color="text.secondary">
-                      No hay tareas en esta etapa
-                    </Typography>
-                  )}
-                </Box>
-              </Paper>
-            ))
-        ) : (
-          <Alert severity="info">
-            Este proyecto no tiene etapas definidas. Agrega una etapa para comenzar a planificar.
-          </Alert>
-        )}
-      </TabPanel>
+                ))}
+              </Grid>
+            ) : (
+              <Typography color="text.secondary">
+                No hay tareas en esta etapa
+              </Typography>
+            )}
+          </Box>
+        </Paper>
+      ))
+  ) : (
+    <Alert severity="info">
+      Este proyecto no tiene etapas definidas. Agrega una etapa para comenzar a planificar.
+    </Alert>
+  )}
+</TabPanel>
       
       <TabPanel value={tabValue} index={1}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Group sx={{ mr: 1 }} color="primary" />
           <Typography variant="h5">Asignaciones</Typography>
         </Box>
-        <Alert severity="info">
-          Esta funcionalidad estará disponible próximamente. Aquí podrás gestionar las asignaciones de personal al proyecto.
-        </Alert>
+
+        {proyecto.etapas && proyecto.etapas.length > 0 ? (
+          proyecto.etapas
+            .sort((a, b) => a.orden - b.orden)
+            .map((etapa) => (
+              <Paper key={etapa.id} sx={{ mb: 3, p: 2 }}>
+                <Typography variant="h6">{etapa.orden}. {etapa.nombre}</Typography>
+                <AsignacionesEtapasTareas tipo="etapa" entidadId={etapa.id} />
+
+                <Divider sx={{ my: 2 }} />
+
+                {etapa.tareas && etapa.tareas.length > 0 ? (
+                  etapa.tareas
+                    .sort((a, b) => a.orden - b.orden)
+                    .map((tarea) => (
+                      <Box key={tarea.id} sx={{ mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1 }}>
+                        <Typography variant="subtitle1">Tarea: {tarea.orden}. {tarea.nombre}</Typography>
+                        <AsignacionesEtapasTareas tipo="tarea" entidadId={tarea.id} />
+                      </Box>
+                    ))
+                ) : (
+                  <Typography color="text.secondary" sx={{ mt: 2 }}>
+                    No hay tareas definidas para esta etapa.
+                  </Typography>
+                )}
+              </Paper>
+            ))
+        ) : (
+          <Alert severity="info">
+            Este proyecto no tiene etapas definidas. Agrega etapas y tareas para gestionar asignaciones.
+          </Alert>
+        )}
       </TabPanel>
+
       
       <TabPanel value={tabValue} index={2}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
