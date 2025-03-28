@@ -1,5 +1,5 @@
 // pages/EmpleadosPage.js
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -20,43 +20,81 @@ import {
   Grid,
   IconButton,
   Tooltip,
-} from '@mui/material';
-import { Search as SearchIcon, Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { useParams, useNavigate } from 'react-router-dom';
-import api from '../services/api';
+  Autocomplete, // Añadir esta importación
+  Chip, // Añadir esta importación
+} from "@mui/material";
+import {
+  Search as SearchIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 const EmpleadoForm = ({ empleado, onClose, onSave, gremios }) => {
   const [formData, setFormData] = useState({
-    codigo: '',
-    nombre: '',
-    apellido: '',
-    tipoDocumento: '',
-    numeroDocumento: '',
-    fechaNacimiento: '',
-    telefono: '',
-    email: '',
-    direccion: '',
-    ciudad: '',
-    codigoPostal: '',
-    pais: '',
-    fechaIngreso: '',
-    estado: 'activo',
-    gremioId: '',
-    observaciones: '',
+    codigo: "",
+    nombre: "",
+    apellido: "",
+    tipoDocumento: "",
+    numeroDocumento: "",
+    fechaNacimiento: "",
+    telefono: "",
+    email: "",
+    direccion: "",
+    ciudad: "",
+    codigoPostal: "",
+    pais: "",
+    fechaIngreso: "",
+    estado: "activo",
+    gremioId: "",
+    observaciones: "",
+    especialidades: [],
     ...empleado,
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [especialidadesDisponibles, setEspecialidadesDisponibles] = useState(
+    []
+  );
+
+  useEffect(() => {
+    const fetchEspecialidades = async () => {
+      try {
+        // Si hay un gremio seleccionado, filtrar por ese gremio
+        const params = formData.gremioId
+          ? { gremioId: formData.gremioId }
+          : undefined;
+        const data = await api.especialidades.getEspecialidades(params);
+        setEspecialidadesDisponibles(data);
+      } catch (err) {
+        console.error("Error al cargar especialidades:", err);
+      }
+    };
+
+    fetchEspecialidades();
+  }, [formData.gremioId]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    // Si cambia el gremio, limpiar las especialidades seleccionadas
+    if (name === "gremioId") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        especialidades: [], // Reiniciar las especialidades cuando cambia el gremio
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
     try {
       let result;
@@ -67,15 +105,17 @@ const EmpleadoForm = ({ empleado, onClose, onSave, gremios }) => {
       }
       onSave(result);
     } catch (err) {
-      console.error('Error al guardar empleado:', err);
-      setError(err.response?.data?.message || 'Error al guardar el empleado.');
+      console.error("Error al guardar empleado:", err);
+      setError(err.response?.data?.message || "Error al guardar el empleado.");
     } finally {
       setLoading(false);
     }
   };
   return (
     <form onSubmit={handleSubmit}>
-      <DialogTitle>{empleado ? 'Editar Empleado' : 'Nuevo Empleado'}</DialogTitle>
+      <DialogTitle>
+        {empleado ? "Editar Empleado" : "Nuevo Empleado"}
+      </DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid item xs={12} sm={6}>
@@ -235,12 +275,44 @@ const EmpleadoForm = ({ empleado, onClose, onSave, gremios }) => {
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={6}>
+            <Autocomplete
+              multiple
+              id="especialidades"
+              options={especialidadesDisponibles}
+              getOptionLabel={(option) => option.nombre}
+              value={formData.especialidades || []}
+              onChange={(event, newValue) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  especialidades: newValue,
+                }));
+              }}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    variant="outlined"
+                    label={option.nombre}
+                    {...getTagProps({ index })}
+                  />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  margin="dense"
+                  label="Especialidades"
+                  placeholder="Seleccionar especialidades"
+                />
+              )}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
             <FormControl fullWidth margin="dense">
               <InputLabel id="gremio-label">Gremio</InputLabel>
               <Select
                 labelId="gremio-label"
                 name="gremioId"
-                value={formData.gremioId || ''}
+                value={formData.gremioId || ""}
                 label="Gremio"
                 onChange={handleChange}
               >
@@ -266,12 +338,16 @@ const EmpleadoForm = ({ empleado, onClose, onSave, gremios }) => {
             />
           </Grid>
         </Grid>
-        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancelar</Button>
         <Button type="submit" variant="contained" disabled={loading}>
-          {loading ? 'Guardando...' : empleado ? 'Actualizar' : 'Crear'}
+          {loading ? "Guardando..." : empleado ? "Actualizar" : "Crear"}
         </Button>
       </DialogActions>
     </form>
@@ -285,10 +361,10 @@ const EmpleadosPage = ({ asignarA }) => {
   const [empleados, setEmpleados] = useState([]);
   const [gremios, setGremios] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [openForm, setOpenForm] = useState(false);
   const [currentEmpleado, setCurrentEmpleado] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [empleadoToDelete, setEmpleadoToDelete] = useState(null);
 
@@ -297,9 +373,9 @@ const EmpleadosPage = ({ asignarA }) => {
     try {
       const data = await api.empleados.getEmpleados();
       setEmpleados(data);
-      setError('');
+      setError("");
     } catch (err) {
-      setError('No se pudieron cargar los empleados.');
+      setError("No se pudieron cargar los empleados.");
     } finally {
       setLoading(false);
     }
@@ -310,7 +386,7 @@ const EmpleadosPage = ({ asignarA }) => {
       const data = await api.gremios.getGremios();
       setGremios(data);
     } catch (err) {
-      console.error('Error al cargar gremios:', err);
+      console.error("Error al cargar gremios:", err);
     }
   };
 
@@ -321,13 +397,15 @@ const EmpleadosPage = ({ asignarA }) => {
 
   const handleAsignarEmpleado = async (empleadoId) => {
     try {
-      await api[`asignacionEmpleado${asignarA === 'etapa' ? 'Etapa' : 'Tarea'}`].createAsignacion({
+      await api[
+        `asignacionEmpleado${asignarA === "etapa" ? "Etapa" : "Tarea"}`
+      ].createAsignacion({
         empleadoId,
         [`${asignarA}Id`]: Number(entidadId),
       });
       navigate(-1);
     } catch (err) {
-      setError('Error al realizar la asignación.');
+      setError("Error al realizar la asignación.");
     }
   };
 
@@ -370,19 +448,30 @@ const EmpleadosPage = ({ asignarA }) => {
       setDeleteConfirmOpen(false);
       setEmpleadoToDelete(null);
     } catch (err) {
-      console.error('Error al eliminar empleado:', err);
-      setError('Error al eliminar el empleado.');
+      console.error("Error al eliminar empleado:", err);
+      setError("Error al eliminar el empleado.");
     }
   };
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Typography variant="h4" component="h1">
-          {asignarA ? 'Asignar Empleado' : 'Gestión de Empleados'}
+          {asignarA ? "Asignar Empleado" : "Gestión de Empleados"}
         </Typography>
         {!asignarA && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenForm()}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenForm()}
+          >
             Nuevo Empleado
           </Button>
         )}
@@ -409,34 +498,54 @@ const EmpleadosPage = ({ asignarA }) => {
       ) : error ? (
         <Alert severity="error">{error}</Alert>
       ) : filteredEmpleados.length === 0 ? (
-        <Paper sx={{ p: 2, textAlign: 'center' }}>
+        <Paper sx={{ p: 2, textAlign: "center" }}>
           <Typography variant="body1">No se encontraron empleados.</Typography>
         </Paper>
       ) : (
         <Grid container spacing={2}>
           {filteredEmpleados.map((empleado) => (
             <Grid item xs={12} sm={6} md={4} key={empleado.id}>
-              <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <Paper
+                sx={{
+                  p: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+              >
                 <Typography variant="h6" component="div">
                   {empleado.nombre} {empleado.apellido}
                 </Typography>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  gutterBottom
+                >
                   Código: {empleado.codigo}
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  Documento: {empleado.tipoDocumento} - {empleado.numeroDocumento}
+                  Documento: {empleado.tipoDocumento} -{" "}
+                  {empleado.numeroDocumento}
                 </Typography>
                 {empleado.gremio && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1 }}
+                  >
                     Gremio: {empleado.gremio.nombre}
                   </Typography>
                 )}
                 <Typography variant="body2" color="text.secondary">
                   Estado: {empleado.estado}
                 </Typography>
-                <Box sx={{ mt: 'auto', display: 'flex', gap: 1 }}>
+                <Box sx={{ mt: "auto", display: "flex", gap: 1 }}>
                   {asignarA ? (
-                    <Button variant="contained" color="primary" onClick={() => handleAsignarEmpleado(empleado.id)}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleAsignarEmpleado(empleado.id)}
+                    >
                       Asignar
                     </Button>
                   ) : (
@@ -447,7 +556,10 @@ const EmpleadosPage = ({ asignarA }) => {
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Eliminar">
-                        <IconButton color="error" onClick={() => handleDeleteConfirm(empleado)}>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleDeleteConfirm(empleado)}
+                        >
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>
@@ -460,7 +572,12 @@ const EmpleadosPage = ({ asignarA }) => {
         </Grid>
       )}
       <Dialog open={openForm} onClose={handleCloseForm} fullWidth maxWidth="md">
-        <EmpleadoForm empleado={currentEmpleado} onClose={handleCloseForm} onSave={handleSaveEmpleado} gremios={gremios} />
+        <EmpleadoForm
+          empleado={currentEmpleado}
+          onClose={handleCloseForm}
+          onSave={handleSaveEmpleado}
+          gremios={gremios}
+        />
       </Dialog>
       <Dialog
         open={deleteConfirmOpen}
@@ -469,13 +586,18 @@ const EmpleadosPage = ({ asignarA }) => {
         <DialogTitle>Confirmar eliminación</DialogTitle>
         <DialogContent>
           <Typography>
-            ¿Está seguro de que desea eliminar el empleado "{empleadoToDelete?.nombre} {empleadoToDelete?.apellido}"?
-            Esta acción no se puede deshacer.
+            ¿Está seguro de que desea eliminar el empleado "
+            {empleadoToDelete?.nombre} {empleadoToDelete?.apellido}"? Esta
+            acción no se puede deshacer.
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteConfirmOpen(false)}>Cancelar</Button>
-          <Button onClick={handleDeleteEmpleado} color="error" variant="contained">
+          <Button
+            onClick={handleDeleteEmpleado}
+            color="error"
+            variant="contained"
+          >
             Eliminar
           </Button>
         </DialogActions>

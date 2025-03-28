@@ -797,26 +797,6 @@ const ProyectoDetallePage = () => {
               </Grid>
             </Grid>
 
-            {/* Botones para asignar Especialidades y Empleados a la Etapa */}
-            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-              <Button 
-                variant="outlined" 
-                size="small"
-                startIcon={<Group />}
-                onClick={() => navigate(`/etapas/${etapa.id}/asignar-empleados`)}
-              >
-                + Agregar Empleado
-              </Button>
-              <Button 
-                variant="outlined" 
-                size="small"
-                startIcon={<EventNote />}
-                onClick={() => navigate(`/etapas/${etapa.id}/asignar-especialidades`)}
-              >
-                + Agregar Especialidad
-              </Button>
-            </Box>
-
             <Divider sx={{ my: 2 }} />
             
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -938,64 +918,62 @@ const ProyectoDetallePage = () => {
 
       <TabPanel value={tabValue} index={3}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <Inventory2Icon sx={{ mr: 1 }} color="primary" />
-          <Typography variant="h5">Materiales del Proyecto</Typography>
-        </Box>
-        
-        <MaterialesProyectoTab proyectoId={id} />
-      </TabPanel>
-      
-      {/* Diálogo para crear/editar etapa */}
-      <Dialog
-        open={etapaFormOpen}
-        onClose={() => setEtapaFormOpen(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <EtapaForm
-          etapa={currentEtapa}
-          proyectoId={id}
-          onClose={() => setEtapaFormOpen(false)}
-          onSave={handleSaveEtapa}
-        />
-      </Dialog>
-      
-      {/* Diálogo para crear/editar tarea */}
-      <Dialog
-        open={tareaFormOpen}
-        onClose={() => setTareaFormOpen(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <TareaForm
-          tarea={currentTarea}
-          etapaId={currentEtapaId}
-          onClose={() => setTareaFormOpen(false)}
-          onSave={handleSaveTarea}
-        />
-      </Dialog>
-      
-      {/* Diálogo para confirmar eliminación */}
-      <Dialog
-        open={deleteConfirmOpen}
-        onClose={() => setDeleteConfirmOpen(false)}
-      >
-        <DialogTitle>Confirmar eliminación</DialogTitle>
-        <DialogContent>
-          <Typography>
-            ¿Está seguro de que desea eliminar {itemToDelete.type === 'etapa' ? 'esta etapa' : 'esta tarea'}?
-            Esta acción no se puede deshacer.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteConfirmOpen(false)}>Cancelar</Button>
-          <Button onClick={handleDelete} color="error" variant="contained">
-            Eliminar
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
-  );
+          <Inventory2Icon sx={{ mr: 1}} color="primary" />
+      <Typography variant="h5">Materiales del Proyecto</Typography>
+      </Box>
+      <MaterialesProyectoTab proyectoId={id} />
+  </TabPanel>
+  
+  {/* Diálogo para crear/editar etapa */}
+  <Dialog
+    open={etapaFormOpen}
+    onClose={() => setEtapaFormOpen(false)}
+    maxWidth="md"
+    fullWidth
+  >
+    <EtapaForm
+      etapa={currentEtapa}
+      proyectoId={id}
+      onClose={() => setEtapaFormOpen(false)}
+      onSave={handleSaveEtapa}
+    />
+  </Dialog>
+  
+  {/* Diálogo para crear/editar tarea */}
+  <Dialog
+    open={tareaFormOpen}
+    onClose={() => setTareaFormOpen(false)}
+    maxWidth="md"
+    fullWidth
+  >
+    <TareaForm
+      tarea={currentTarea}
+      etapaId={currentEtapaId}
+      onClose={() => setTareaFormOpen(false)}
+      onSave={handleSaveTarea}
+    />
+  </Dialog>
+  
+  {/* Diálogo para confirmar eliminación */}
+  <Dialog
+    open={deleteConfirmOpen}
+    onClose={() => setDeleteConfirmOpen(false)}
+  >
+    <DialogTitle>Confirmar eliminación</DialogTitle>
+    <DialogContent>
+      <Typography>
+        ¿Está seguro de que desea eliminar {itemToDelete.type === 'etapa' ? 'esta etapa' : 'esta tarea'}?
+        Esta acción no se puede deshacer.
+      </Typography>
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={() => setDeleteConfirmOpen(false)}>Cancelar</Button>
+      <Button onClick={handleDelete} color="error" variant="contained">
+        Eliminar
+      </Button>
+    </DialogActions>
+  </Dialog>
+</Box>
+);
 };
-
 export default ProyectoDetallePage;
