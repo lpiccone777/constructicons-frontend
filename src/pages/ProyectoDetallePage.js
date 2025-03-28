@@ -914,48 +914,9 @@ const ProyectoDetallePage = () => {
     </Alert>
   )}
 </TabPanel>
+
       
       <TabPanel value={tabValue} index={1}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <Group sx={{ mr: 1 }} color="primary" />
-          <Typography variant="h5">Asignaciones</Typography>
-        </Box>
-
-        {proyecto.etapas && proyecto.etapas.length > 0 ? (
-          proyecto.etapas
-            .sort((a, b) => a.orden - b.orden)
-            .map((etapa) => (
-              <Paper key={etapa.id} sx={{ mb: 3, p: 2 }}>
-                <Typography variant="h6">{etapa.orden}. {etapa.nombre}</Typography>
-                <AsignacionesEtapasTareas tipo="etapa" entidadId={etapa.id} />
-
-                <Divider sx={{ my: 2 }} />
-
-                {etapa.tareas && etapa.tareas.length > 0 ? (
-                  etapa.tareas
-                    .sort((a, b) => a.orden - b.orden)
-                    .map((tarea) => (
-                      <Box key={tarea.id} sx={{ mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1 }}>
-                        <Typography variant="subtitle1">Tarea: {tarea.orden}. {tarea.nombre}</Typography>
-                        <AsignacionesEtapasTareas tipo="tarea" entidadId={tarea.id} />
-                      </Box>
-                    ))
-                ) : (
-                  <Typography color="text.secondary" sx={{ mt: 2 }}>
-                    No hay tareas definidas para esta etapa.
-                  </Typography>
-                )}
-              </Paper>
-            ))
-        ) : (
-          <Alert severity="info">
-            Este proyecto no tiene etapas definidas. Agrega etapas y tareas para gestionar asignaciones.
-          </Alert>
-        )}
-      </TabPanel>
-
-      
-      <TabPanel value={tabValue} index={2}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Description sx={{ mr: 1 }} color="primary" />
           <Typography variant="h5">Documentos</Typography>
@@ -965,7 +926,7 @@ const ProyectoDetallePage = () => {
         </Alert>
       </TabPanel>
       
-      <TabPanel value={tabValue} index={3}>
+      <TabPanel value={tabValue} index={2}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Comment sx={{ mr: 1 }} color="primary" />
           <Typography variant="h5">Notas</Typography>
@@ -975,7 +936,7 @@ const ProyectoDetallePage = () => {
         </Alert>
       </TabPanel>
 
-      <TabPanel value={tabValue} index={4}>
+      <TabPanel value={tabValue} index={3}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Inventory2Icon sx={{ mr: 1 }} color="primary" />
           <Typography variant="h5">Materiales del Proyecto</Typography>

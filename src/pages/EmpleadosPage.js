@@ -1,3 +1,4 @@
+// pages/EmpleadosPage.js
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
@@ -17,15 +18,11 @@ import {
   MenuItem,
   Alert,
   Grid,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody
+  IconButton,
+  Tooltip,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
-import {useParams, useNavigate } from 'react-router-dom';
+import { Search as SearchIcon, Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const EmpleadoForm = ({ empleado, onClose, onSave, gremios }) => {
@@ -284,7 +281,7 @@ const EmpleadoForm = ({ empleado, onClose, onSave, gremios }) => {
 const EmpleadosPage = ({ asignarA }) => {
   const { id: entidadId } = useParams();
   const navigate = useNavigate();
-  
+
   const [empleados, setEmpleados] = useState([]);
   const [gremios, setGremios] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -292,6 +289,8 @@ const EmpleadosPage = ({ asignarA }) => {
   const [openForm, setOpenForm] = useState(false);
   const [currentEmpleado, setCurrentEmpleado] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [empleadoToDelete, setEmpleadoToDelete] = useState(null);
 
   const fetchEmpleados = useCallback(async () => {
     setLoading(true);
@@ -322,7 +321,7 @@ const EmpleadosPage = ({ asignarA }) => {
 
   const handleAsignarEmpleado = async (empleadoId) => {
     try {
-      await api.asignacionEmpleadoTarea.createAsignacion({
+      await api[`asignacionEmpleado${asignarA === 'etapa' ? 'Etapa' : 'Tarea'}`].createAsignacion({
         empleadoId,
         [`${asignarA}Id`]: Number(entidadId),
       });
@@ -333,12 +332,14 @@ const EmpleadosPage = ({ asignarA }) => {
   };
 
   const filteredEmpleados = useMemo(() => {
-    return empleados.filter(emp => {
+    return empleados.filter((emp) => {
       const term = searchTerm.toLowerCase();
       return (
         emp.nombre.toLowerCase().includes(term) ||
         emp.apellido.toLowerCase().includes(term) ||
-        emp.codigo.toLowerCase().includes(term)
+        emp.codigo.toLowerCase().includes(term) ||
+        (emp.gremio && emp.gremio.nombre.toLowerCase().includes(term)) ||
+        emp.numeroDocumento.toLowerCase().includes(term)
       );
     });
   }, [empleados, searchTerm]);
@@ -357,10 +358,17 @@ const EmpleadosPage = ({ asignarA }) => {
     setOpenForm(false);
   };
 
-  const handleDeleteEmpleado = async (id) => {
+  const handleDeleteConfirm = (empleado) => {
+    setEmpleadoToDelete(empleado);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteEmpleado = async () => {
     try {
-      await api.empleados.deleteEmpleado(id);
+      await api.empleados.deleteEmpleado(empleadoToDelete.id);
       fetchEmpleados();
+      setDeleteConfirmOpen(false);
+      setEmpleadoToDelete(null);
     } catch (err) {
       console.error('Error al eliminar empleado:', err);
       setError('Error al eliminar el empleado.');
@@ -369,75 +377,109 @@ const EmpleadosPage = ({ asignarA }) => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        {asignarA ? 'Asignar Empleado' : 'Gestión de Empleados'}
-      </Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <TextField
-          label="Buscar empleado..."
-          variant="outlined"
-          size="small"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{ startAdornment: (<InputAdornment position="start"><SearchIcon /></InputAdornment>) }}
-          sx={{ mr: 2, flex: 1 }}
-        />
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4" component="h1">
+          {asignarA ? 'Asignar Empleado' : 'Gestión de Empleados'}
+        </Typography>
         {!asignarA && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenForm()}>
             Nuevo Empleado
           </Button>
         )}
       </Box>
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <TextField
+          fullWidth
+          label="Buscar empleado..."
+          variant="outlined"
+          size="small"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Paper>
       {loading ? (
         <CircularProgress />
       ) : error ? (
         <Alert severity="error">{error}</Alert>
-      ) : (
-        <Paper>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Código</TableCell>
-                <TableCell>Nombre Completo</TableCell>
-                <TableCell>Documento</TableCell>
-                <TableCell>Estado</TableCell>
-                <TableCell>Gremio</TableCell>
-                <TableCell>Acciones</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredEmpleados.map((emp) => (
-                <TableRow key={emp.id}>
-                  <TableCell>{emp.id}</TableCell>
-                  <TableCell>{emp.codigo}</TableCell>
-                  <TableCell>{emp.nombre} {emp.apellido}</TableCell>
-                  <TableCell>{emp.tipoDocumento}: {emp.numeroDocumento}</TableCell>
-                  <TableCell>{emp.estado}</TableCell>
-                  <TableCell>{emp.gremio ? emp.gremio.nombre : 'Sin asignar'}</TableCell>
-                  <TableCell>
-                    {asignarA ? (
-                      <Button variant="contained" color="primary" onClick={() => handleAsignarEmpleado(emp.id)}>
-                        Asignar
-                      </Button>
-                    ) : (
-                      <>
-                        <Button variant="outlined" onClick={() => handleOpenForm(emp)} sx={{ mr: 1 }}>
-                          Editar
-                        </Button>
-                        <Button variant="outlined" color="error" onClick={() => handleDeleteEmpleado(emp.id)}>
-                          Eliminar
-                        </Button>
-                      </>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      ) : filteredEmpleados.length === 0 ? (
+        <Paper sx={{ p: 2, textAlign: 'center' }}>
+          <Typography variant="body1">No se encontraron empleados.</Typography>
         </Paper>
+      ) : (
+        <Grid container spacing={2}>
+          {filteredEmpleados.map((empleado) => (
+            <Grid item xs={12} sm={6} md={4} key={empleado.id}>
+              <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Typography variant="h6" component="div">
+                  {empleado.nombre} {empleado.apellido}
+                </Typography>
+                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  Código: {empleado.codigo}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  Documento: {empleado.tipoDocumento} - {empleado.numeroDocumento}
+                </Typography>
+                {empleado.gremio && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    Gremio: {empleado.gremio.nombre}
+                  </Typography>
+                )}
+                <Typography variant="body2" color="text.secondary">
+                  Estado: {empleado.estado}
+                </Typography>
+                <Box sx={{ mt: 'auto', display: 'flex', gap: 1 }}>
+                  {asignarA ? (
+                    <Button variant="contained" color="primary" onClick={() => handleAsignarEmpleado(empleado.id)}>
+                      Asignar
+                    </Button>
+                  ) : (
+                    <>
+                      <Tooltip title="Editar">
+                        <IconButton onClick={() => handleOpenForm(empleado)}>
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Eliminar">
+                        <IconButton color="error" onClick={() => handleDeleteConfirm(empleado)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </>
+                  )}
+                </Box>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
       )}
-      {/* Diálogos y formularios existentes */}
+      <Dialog open={openForm} onClose={handleCloseForm} fullWidth maxWidth="md">
+        <EmpleadoForm empleado={currentEmpleado} onClose={handleCloseForm} onSave={handleSaveEmpleado} gremios={gremios} />
+      </Dialog>
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+      >
+        <DialogTitle>Confirmar eliminación</DialogTitle>
+        <DialogContent>
+          <Typography>
+            ¿Está seguro de que desea eliminar el empleado "{empleadoToDelete?.nombre} {empleadoToDelete?.apellido}"?
+            Esta acción no se puede deshacer.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmOpen(false)}>Cancelar</Button>
+          <Button onClick={handleDeleteEmpleado} color="error" variant="contained">
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
