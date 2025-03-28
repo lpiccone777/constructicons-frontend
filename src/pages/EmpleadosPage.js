@@ -98,11 +98,43 @@ const EmpleadoForm = ({ empleado, onClose, onSave, gremios }) => {
     setLoading(true);
     try {
       let result;
+      // Crear una copia de los datos del formulario sin las especialidades
+      const empleadoData = { ...formData };
+      const especialidades = [...(empleadoData.especialidades || [])];
+      delete empleadoData.especialidades;
+
       if (empleado) {
-        result = await api.empleados.updateEmpleado(empleado.id, formData);
+        // Si estamos editando, actualizamos el empleado
+        result = await api.empleados.updateEmpleado(empleado.id, empleadoData);
       } else {
-        result = await api.empleados.createEmpleado(formData);
+        // Si estamos creando, primero creamos el empleado
+        result = await api.empleados.createEmpleado(empleadoData);
       }
+
+      // Si hay especialidades seleccionadas, las asociamos al empleado
+      if (especialidades.length > 0) {
+        const empleadoId = result.id;
+
+        // Obtener las asignaciones existentes para este empleado
+        const existingAssignments = await api.empleadosEspecialidades.findAll({
+          empleadoId: empleadoId,
+        });
+
+        // Eliminar asignaciones existentes
+        for (const assignment of existingAssignments) {
+          await api.empleadosEspecialidades.delete(assignment.id);
+        }
+
+        // Crear nuevas asignaciones de especialidades
+        for (const especialidad of especialidades) {
+          await api.empleadosEspecialidades.create({
+            empleadoId: empleadoId,
+            especialidadId: especialidad.id,
+            valorHora: especialidad.valorHoraBase, // Usar el valorHoraBase de la especialidad
+          });
+        }
+      }
+
       onSave(result);
     } catch (err) {
       console.error("Error al guardar empleado:", err);
@@ -153,15 +185,34 @@ const EmpleadoForm = ({ empleado, onClose, onSave, gremios }) => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              margin="dense"
-              label="Tipo de Documento"
-              name="tipoDocumento"
-              value={formData.tipoDocumento}
-              onChange={handleChange}
-              fullWidth
-              required
-            />
+            <FormControl fullWidth margin="dense">
+              <InputLabel id="tipo-documento-label">
+                Tipo de Documento
+              </InputLabel>
+              <Select
+                labelId="tipo-documento-label"
+                name="tipoDocumento"
+                value={formData.tipoDocumento}
+                label="Tipo de Documento"
+                onChange={handleChange}
+                required
+              >
+                <MenuItem value="DNI">
+                  DNI - Documento Nacional de Identidad
+                </MenuItem>
+                <MenuItem value="LC">LC - Libreta Cívica</MenuItem>
+                <MenuItem value="LE">LE - Libreta de Enrolamiento</MenuItem>
+                <MenuItem value="CI">CI - Cédula de Identidad</MenuItem>
+                <MenuItem value="PASAPORTE">Pasaporte</MenuItem>
+                <MenuItem value="CUIL">
+                  CUIL - Clave Única de Identificación Laboral
+                </MenuItem>
+                <MenuItem value="CUIT">
+                  CUIT - Clave Única de Identificación Tributaria
+                </MenuItem>
+                <MenuItem value="CDI">CDI - Clave de Identificación</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -279,7 +330,9 @@ const EmpleadoForm = ({ empleado, onClose, onSave, gremios }) => {
               multiple
               id="especialidades"
               options={especialidadesDisponibles}
-              getOptionLabel={(option) => option.nombre}
+              getOptionLabel={(option) =>
+                `${option.nombre} (Valor hora: $${option.valorHoraBase})`
+              }
               value={formData.especialidades || []}
               onChange={(event, newValue) => {
                 setFormData((prev) => ({
@@ -291,7 +344,7 @@ const EmpleadoForm = ({ empleado, onClose, onSave, gremios }) => {
                 value.map((option, index) => (
                   <Chip
                     variant="outlined"
-                    label={option.nombre}
+                    label={`${option.nombre} ($${option.valorHoraBase}/h)`}
                     {...getTagProps({ index })}
                   />
                 ))
@@ -354,10 +407,114 @@ const EmpleadoForm = ({ empleado, onClose, onSave, gremios }) => {
   );
 };
 
+const EspecialidadSelectorDialog = ({
+  open,
+  onClose,
+  empleado,
+  onSeleccionarEspecialidad,
+  asignarA,
+}) => {
+  const [selectedEspecialidadId, setSelectedEspecialidadId] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Resetear la selección cuando cambia el empleado o se abre el diálogo
+    if (
+      open &&
+      empleado &&
+      empleado.especialidades &&
+      empleado.especialidades.length > 0
+    ) {
+      setSelectedEspecialidadId(
+        empleado.especialidades[0].especialidadId.toString()
+      );
+    }
+  }, [open, empleado]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedEspecialidadId) return;
+
+    setLoading(true);
+    try {
+      const especialidad = empleado.especialidades.find(
+        (esp) => esp.especialidadId.toString() === selectedEspecialidadId
+      );
+
+      await onSeleccionarEspecialidad({
+        empleadoId: empleado.id,
+        horasEstimadas: 8, // 8 horas por defecto
+        valorHora: Number(especialidad.valorHora),
+      });
+
+      onClose();
+    } catch (error) {
+      console.error("Error al asignar con especialidad:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!empleado) return null;
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>
+          Seleccionar especialidad para {empleado.nombre} {empleado.apellido}
+        </DialogTitle>
+        <DialogContent>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            paragraph
+            sx={{ mt: 1 }}
+          >
+            Este empleado tiene múltiples especialidades. Por favor, seleccione
+            la especialidad con la que trabajará en esta{" "}
+            {asignarA === "etapa" ? "etapa" : "tarea"}.
+          </Typography>
+
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel id="especialidad-select-label">Especialidad</InputLabel>
+            <Select
+              labelId="especialidad-select-label"
+              value={selectedEspecialidadId}
+              label="Especialidad"
+              onChange={(e) => setSelectedEspecialidadId(e.target.value)}
+              required
+            >
+              {empleado.especialidades &&
+                empleado.especialidades.map((esp) => (
+                  <MenuItem key={esp.id} value={esp.especialidadId.toString()}>
+                    {esp.especialidad.nombre} - ${esp.valorHora}/hora
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancelar</Button>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={loading || !selectedEspecialidadId}
+          >
+            {loading ? "Asignando..." : "Confirmar"}
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+};
+
 const EmpleadosPage = ({ asignarA }) => {
   const { id: entidadId } = useParams();
   const navigate = useNavigate();
-
+  const [showEspecialidadSelector, setShowEspecialidadSelector] =
+    useState(false);
+  const [empleadoToAsign, setEmpleadoToAsign] = useState(null);
   const [empleados, setEmpleados] = useState([]);
   const [gremios, setGremios] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -371,8 +528,39 @@ const EmpleadosPage = ({ asignarA }) => {
   const fetchEmpleados = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await api.empleados.getEmpleados();
-      setEmpleados(data);
+      // Obtener los empleados con sus especialidades incluidas
+      const data = await api.empleados.getEmpleados({
+        includeEspecialidades: true,
+      });
+
+      // Para cada empleado, cargar sus especialidades si no vienen incluidas
+      const empleadosConEspecialidades = await Promise.all(
+        data.map(async (emp) => {
+          if (!emp.especialidades) {
+            const asignaciones = await api.empleadosEspecialidades.findAll({
+              empleadoId: emp.id,
+            });
+            // Si hay asignaciones, obtener detalles de especialidades
+            if (asignaciones.length > 0) {
+              const especialidadesPromises = asignaciones.map(async (asig) => {
+                const especialidad = await api.especialidades.getEspecialidad(
+                  asig.especialidadId
+                );
+                return {
+                  ...especialidad,
+                  valorHoraBase: asig.valorHora, // Usar el valor asignado o el valor base
+                };
+              });
+              emp.especialidades = await Promise.all(especialidadesPromises);
+            } else {
+              emp.especialidades = [];
+            }
+          }
+          return emp;
+        })
+      );
+
+      setEmpleados(empleadosConEspecialidades);
       setError("");
     } catch (err) {
       setError("No se pudieron cargar los empleados.");
@@ -395,16 +583,41 @@ const EmpleadosPage = ({ asignarA }) => {
     fetchGremios();
   }, [fetchEmpleados]);
 
-  const handleAsignarEmpleado = async (empleadoId) => {
+  const handleAsignarEmpleado = async (empleado) => {
     try {
-      await api[
-        `asignacionEmpleado${asignarA === "etapa" ? "Etapa" : "Tarea"}`
-      ].createAsignacion({
-        empleadoId,
-        [`${asignarA}Id`]: Number(entidadId),
-      });
-      navigate(-1);
+      // Si el empleado no tiene especialidades, usar un valor por defecto
+      if (!empleado.especialidades || empleado.especialidades.length === 0) {
+        await api[
+          `asignacionEmpleado${asignarA === "etapa" ? "Etapa" : "Tarea"}`
+        ].createAsignacion({
+          empleadoId: empleado.id,
+          [`${asignarA}Id`]: Number(entidadId),
+          horasEstimadas: 8, // 8 horas por defecto
+          valorHora: 0, // Valor por defecto si no hay especialidad
+        });
+        navigate(-1);
+        return;
+      }
+
+      // Si el empleado tiene solo una especialidad, usar su valorHoraBase
+      if (empleado.especialidades.length === 1) {
+        await api[
+          `asignacionEmpleado${asignarA === "etapa" ? "Etapa" : "Tarea"}`
+        ].createAsignacion({
+          empleadoId: empleado.id,
+          [`${asignarA}Id`]: Number(entidadId),
+          horasEstimadas: 8, // 8 horas por defecto
+          valorHora: empleado.especialidades[0].valorHoraBase,
+        });
+        navigate(-1);
+        return;
+      }
+
+      // Si el empleado tiene múltiples especialidades, mostrar diálogo de selección
+      setEmpleadoToAsign(empleado);
+      setShowEspecialidadSelector(true);
     } catch (err) {
+      console.error("Error al realizar la asignación:", err);
       setError("Error al realizar la asignación.");
     }
   };
@@ -450,6 +663,21 @@ const EmpleadosPage = ({ asignarA }) => {
     } catch (err) {
       console.error("Error al eliminar empleado:", err);
       setError("Error al eliminar el empleado.");
+    }
+  };
+
+  const handleFinalizarAsignacion = async (asignacionData) => {
+    try {
+      await api[
+        `asignacionEmpleado${asignarA === "etapa" ? "Etapa" : "Tarea"}`
+      ].createAsignacion({
+        ...asignacionData,
+        [`${asignarA}Id`]: Number(entidadId),
+      });
+      navigate(-1);
+    } catch (err) {
+      console.error("Error al realizar la asignación:", err);
+      setError("Error al realizar la asignación.");
     }
   };
 
@@ -544,7 +772,7 @@ const EmpleadosPage = ({ asignarA }) => {
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={() => handleAsignarEmpleado(empleado.id)}
+                      onClick={() => handleAsignarEmpleado(empleado)}
                     >
                       Asignar
                     </Button>
@@ -602,6 +830,13 @@ const EmpleadosPage = ({ asignarA }) => {
           </Button>
         </DialogActions>
       </Dialog>
+      <EspecialidadSelectorDialog
+        open={showEspecialidadSelector}
+        onClose={() => setShowEspecialidadSelector(false)}
+        empleado={empleadoToAsign}
+        onSeleccionarEspecialidad={handleFinalizarAsignacion}
+        asignarA={asignarA}
+      />
     </Box>
   );
 };

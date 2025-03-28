@@ -482,6 +482,30 @@ const gremioEspecialidadApi = {
   }
 };
 
+// API de empleados-especialidades
+const empleadosEspecialidadesApi = {
+  findAll: async (params = {}) => {
+    const response = await apiClient.get('/empleados-especialidades', { params });
+    return response.data;
+  },
+  findById: async (id) => {
+    const response = await apiClient.get(`/empleados-especialidades/${id}`);
+    return response.data;
+  },
+  create: async (data) => {
+    const response = await apiClient.post('/empleados-especialidades', data);
+    return response.data;
+  },
+  update: async (id, data) => {
+    const response = await apiClient.put(`/empleados-especialidades/${id}`, data);
+    return response.data;
+  },
+  delete: async (id) => {
+    const response = await apiClient.delete(`/empleados-especialidades/${id}`);
+    return response.data;
+  }
+};
+
 /* --------------------- Exportación Final --------------------- */
 
 export default {
@@ -516,6 +540,7 @@ export default {
   gremios: gremiosApi,
   especialidades: especialidadesApi,
   empleados: empleadosApi,
+  empleadosEspecialidades: empleadosEspecialidadesApi, 
   asignacionEmpleadoTarea: asignacionEmpleadoTareaApi,
   asignacionEspecialidadEtapa: asignacionEspecialidadEtapaApi,
   asignacionEspecialidadTarea: asignacionEspecialidadTareaApi,
