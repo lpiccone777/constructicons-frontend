@@ -27,17 +27,21 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar
-      ref={navbarRef}
-      position="fixed"
-      sx={{
-        top: 0,
-        left: 0,
-        right: 0,
-        boxShadow: 3,
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-      }}
-    >
+<AppBar
+  ref={navbarRef}
+  position="fixed"
+  elevation={0}
+  sx={{
+    top: 0,
+    left: 0,
+    right: 0,
+    boxShadow: 'none', // eliminar sombra para unificar visualmente (opcional)
+    borderRadius: 0, // asegurar sin borde redondeado
+    m: 0, // margen reset
+    p: 0, // padding reset
+    zIndex: (theme) => theme.zIndex.drawer + 1,
+  }}
+>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Typography variant="h6">Constructicons</Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

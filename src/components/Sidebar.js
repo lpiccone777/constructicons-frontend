@@ -30,13 +30,16 @@ const menuItemsData = {
   ADMIN: [
     { name: 'Dashboard', path: '/', icon: <HomeIcon /> },
     { name: 'Proyectos', path: '/proyectos', icon: <BusinessIcon /> },
-    { 
-      name: 'Recursos', 
+    {
+      name: 'Recursos',
       icon: <Inventory2Icon />,
       children: [
         { name: 'Materiales', path: '/materiales', icon: <Inventory2Icon /> },
         { name: 'Proveedores', path: '/proveedores', icon: <LocalShippingIcon /> },
-      ]
+        { name: 'Gremios', path: '/gremios', icon: <BusinessIcon /> },
+        { name: 'Especialidades', path: '/especialidades', icon: <BusinessIcon /> },
+        { name: 'Empleados', path: '/empleados', icon: <PeopleIcon /> },
+      ],
     },
     {
       name: 'Configuración',
@@ -46,7 +49,8 @@ const menuItemsData = {
         { name: 'Roles', path: '/roles', icon: <AdminPanelSettingsIcon /> },
       ],
     },
-  ],
+  ]
+  ,
   DIRECTOR: [
     { name: 'Dashboard', path: '/', icon: <HomeIcon /> },
     { name: 'Proyectos', path: '/proyectos', icon: <BusinessIcon /> },
@@ -186,8 +190,11 @@ const Sidebar = ({ onWidthChange }) => {
           backgroundColor: theme.palette.primary.main,
           color: theme.palette.primary.contrastText,
           borderRight: '1px solid rgba(0,0,0,0.12)',
-          pt: 2,
-          pb: 2,
+          pt: 0,
+          pb: 0,
+          m: 0, // <-- reset margen
+          p: 0, // <-- reset padding
+          borderRadius: 0,
         },
         onMouseEnter: () => { if (!pinned) setExpanded(true); },
         onMouseLeave: () => { if (!pinned) setExpanded(false); },
