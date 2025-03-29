@@ -25,11 +25,23 @@ import Inventory2Icon from '@mui/icons-material/Inventory2';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { useAuth } from '../context/AuthContext';
 import { useNavbarHeight } from '../context/NavbarHeightContext';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+
 
 const menuItemsData = {
   ADMIN: [
     { name: 'Dashboard', path: '/', icon: <HomeIcon /> },
     { name: 'Proyectos', path: '/proyectos', icon: <BusinessIcon /> },
+    {
+      name: 'Reportes',
+      icon: <AssessmentIcon />,
+      children: [
+        { name: 'Dashboard Ejecutivo', path: '/reportes/dashboard-ejecutivo', icon: <AssessmentIcon /> },
+        { name: 'Análisis de Materiales', path: '/reportes/analisis-materiales', icon: <AssessmentIcon /> },
+        { name: 'Avance de Proyecto', path: '/reportes/avance-proyecto', icon: <AssessmentIcon /> },
+        { name: 'Recursos Humanos', path: '/reportes/recursos-humanos', icon: <AssessmentIcon /> },
+      ],
+    },
     {
       name: 'Recursos',
       icon: <Inventory2Icon />,
