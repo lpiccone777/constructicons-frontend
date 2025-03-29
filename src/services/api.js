@@ -506,6 +506,26 @@ const empleadosEspecialidadesApi = {
   }
 };
 
+// API de reportes
+const reportesApi = {
+  getDashboardEjecutivo: async () => {
+    const response = await apiClient.get('/reportes/dashboard-ejecutivo');
+    return response.data;
+  },
+  getAnalisisMateriales: async () => {
+    const response = await apiClient.get('/reportes/analisis-materiales');
+    return response.data;
+  },
+  getAvanceProyecto: async (proyectoId) => {
+    const response = await apiClient.get(`/reportes/avance-proyecto/${proyectoId}`);
+    return response.data;
+  },
+  getRecursosHumanos: async () => {
+    const response = await apiClient.get('/reportes/recursos-humanos');
+    return response.data;
+  }
+};
+
 /* --------------------- Exportación Final --------------------- */
 
 export default {
@@ -544,5 +564,6 @@ export default {
   asignacionEmpleadoTarea: asignacionEmpleadoTareaApi,
   asignacionEspecialidadEtapa: asignacionEspecialidadEtapaApi,
   asignacionEspecialidadTarea: asignacionEspecialidadTareaApi,
-  gremioEspecialidad: gremioEspecialidadApi
+  gremioEspecialidad: gremioEspecialidadApi,
+  reportes: reportesApi
 };

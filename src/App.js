@@ -18,6 +18,8 @@ import GremiosPage from './pages/GremiosPage';
 import EspecialidadesPage from './pages/EspecialidadesPage';
 import EmpleadosPage from './pages/EmpleadosPage';
 import { useAuth } from './context/AuthContext';
+import ReportesPage from './pages/Reportes/ReportesPage';
+
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -226,7 +228,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/reportes/*"
+            element={
+              <ProtectedRoute>
+                <ReportesPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Redirigir si la ruta no existe */}
           <Route path="*" element={<Navigate to="/" replace />} />
