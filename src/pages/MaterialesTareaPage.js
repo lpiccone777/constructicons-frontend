@@ -105,16 +105,30 @@ const AsignacionMaterialForm = ({ tarea, asignacion, onClose, onSave }) => {
     setSubmitting(true);
 
     try {
-      const dataToSend = {
-        ...formData,
-        tareaId: parseInt(formData.tareaId)
-      };
-
       let result;
       if (asignacion) {
+        // Solo enviar los campos que el backend espera para actualización
+        // No enviar materialId ni tareaId en la actualización
+        const dataToSend = {
+          cantidad: Number(formData.cantidad).toFixed(2), // Formatear cantidad como decimal con 2 decimales
+          unidadMedida: formData.unidadMedida,
+          estado: formData.estado,
+          observaciones: formData.observaciones
+        };
+        
         // Actualizar asignación existente
         result = await api.asignacionesMateriales.updateAsignacionMaterial(asignacion.id, dataToSend);
       } else {
+        // Para creación sí necesitamos incluir materialId y tareaId
+        const dataToSend = {
+          materialId: parseInt(formData.materialId),
+          tareaId: parseInt(formData.tareaId),
+          cantidad: Number(formData.cantidad).toFixed(2), // Formatear cantidad como decimal con 2 decimales
+          unidadMedida: formData.unidadMedida,
+          estado: formData.estado,
+          observaciones: formData.observaciones
+        };
+        
         // Crear nueva asignación
         result = await api.asignacionesMateriales.createAsignacionMaterial(dataToSend);
       }

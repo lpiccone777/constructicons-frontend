@@ -59,13 +59,24 @@ const MaterialForm = ({ material, onClose, onSave }) => {
     setLoading(true);
 
     try {
+      // Formatear los campos numéricos a formato decimal con 2 decimales
+      const dataToSend = {
+        codigo: formData.codigo,
+        nombre: formData.nombre,
+        descripcion: formData.descripcion,
+        categoria: formData.categoria,
+        unidadMedida: formData.unidadMedida,
+        precioReferencia: Number(formData.precioReferencia).toFixed(2),
+        stockMinimo: formData.stockMinimo ? Number(formData.stockMinimo).toFixed(2) : null
+      };
+      
       let result;
       if (material) {
         // Actualizar material existente
-        result = await api.materiales.updateMaterial(material.id, formData);
+        result = await api.materiales.updateMaterial(material.id, dataToSend);
       } else {
         // Crear nuevo material
-        result = await api.materiales.createMaterial(formData);
+        result = await api.materiales.createMaterial(dataToSend);
       }
       onSave(result);
     } catch (err) {
