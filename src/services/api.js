@@ -49,6 +49,10 @@ const proyectosApi = {
   getEstadisticas: async () => {
     const response = await apiClient.get('/proyectos/stats');
     return response.data;
+  },
+  getEmpleadosProyecto: async (proyectoId) => {
+    const response = await apiClient.get(`/proyectos/${proyectoId}/empleados`);
+    return response.data;
   }
 };
 
@@ -317,6 +321,44 @@ const materialesProveedoresApi = {
 
 /* --------------------- Nuevos Endpoints --------------------- */
 
+// API de documentos
+const documentosApi = {
+  getDocumentos: async (filters = {}) => {
+    const response = await apiClient.get('/documentos', { params: filters });
+    return response.data;
+  },
+  getDocumento: async (id) => {
+    const response = await apiClient.get(`/documentos/${id}`);
+    return response.data;
+  },
+  createDocumento: async (documentoData) => {
+    const response = await apiClient.post('/documentos', documentoData);
+    return response.data;
+  },
+  uploadDocumento: async (formData) => {
+    const response = await apiClient.post('/documentos/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  },
+  downloadDocumento: async (id) => {
+    const response = await apiClient.get(`/documentos/${id}/descargar`, {
+      responseType: 'blob'
+    });
+    return response;
+  },
+  updateDocumento: async (id, documentoData) => {
+    const response = await apiClient.put(`/documentos/${id}`, documentoData);
+    return response.data;
+  },
+  deleteDocumento: async (id) => {
+    const response = await apiClient.delete(`/documentos/${id}`);
+    return response.data;
+  }
+};
+
 // API de gremios
 const gremiosApi = {
   getGremios: async () => {
@@ -557,6 +599,7 @@ export default {
   asignacionesMateriales: asignacionesMaterialesApi,
   materialesProveedores: materialesProveedoresApi,
   // Nuevos módulos
+  documentos: documentosApi,
   gremios: gremiosApi,
   especialidades: especialidadesApi,
   empleados: empleadosApi,

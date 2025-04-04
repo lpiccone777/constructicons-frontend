@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import MaterialesProyectoTab from '../components/MaterialesProyectoTab';
 import AsignacionesEtapasTareas from '../components/Asignaciones/AsignacionesEtapasTareas';
+import DocumentosTab from '../components/Documentos/DocumentosTab';
+import AsignacionesProyectoTab from '../components/AsignacionesProyectoTab';
 
 import {
   Box,
@@ -42,7 +44,8 @@ import {
   AccessTime,
   Group,
   Description,
-  Comment
+  Comment,
+  People
 } from '@mui/icons-material';
 import api from '../services/api';
 
@@ -702,7 +705,7 @@ const ProyectoDetallePage = () => {
           >
             <Tab label="Etapas y Tareas" />
             <Tab label="Documentos" />
-            <Tab label="Notas" />
+            <Tab label="Personal" /> 
             <Tab label="Materiales" /> 
           </Tabs>
         </Paper>
@@ -901,28 +904,24 @@ const ProyectoDetallePage = () => {
           <Description sx={{ mr: 1 }} color="primary" />
           <Typography variant="h5">Documentos</Typography>
         </Box>
-        <Alert severity="info">
-          Esta funcionalidad estará disponible próximamente. Aquí podrás gestionar los documentos relacionados con el proyecto.
-        </Alert>
+        <DocumentosTab proyectoId={id} />
       </TabPanel>
       
       <TabPanel value={tabValue} index={2}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <Comment sx={{ mr: 1 }} color="primary" />
-          <Typography variant="h5">Notas</Typography>
+          <People sx={{ mr: 1 }} color="primary" />
+          <Typography variant="h5">Personal del Proyecto</Typography>
         </Box>
-        <Alert severity="info">
-          Esta funcionalidad estará disponible próximamente. Aquí podrás gestionar las notas y comentarios del proyecto.
-        </Alert>
+        <AsignacionesProyectoTab proyectoId={id} />
       </TabPanel>
 
       <TabPanel value={tabValue} index={3}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Inventory2Icon sx={{ mr: 1}} color="primary" />
-      <Typography variant="h5">Materiales del Proyecto</Typography>
-      </Box>
-      <MaterialesProyectoTab proyectoId={id} />
-  </TabPanel>
+          <Typography variant="h5">Materiales del Proyecto</Typography>
+        </Box>
+        <MaterialesProyectoTab proyectoId={id} />
+      </TabPanel>
   
   {/* Diálogo para crear/editar etapa */}
   <Dialog
